@@ -49,3 +49,120 @@ def random_number(rozklad,n): # <1,n>
         if X>=przedzialy[i] and X<przedzialy[i+1]:
             return i+1
 
+def zadanie(x,cache,rez,obsluga,mark,flags_use_cach,flags_use_res):
+    if obsluga=='fifo':
+        if x in cache:
+            return 0
+        else:
+            cache.pop(0)
+            cache.append(x)
+            return 1
+        
+    elif obsluga=='fwf':
+        if x in cache:
+            return 0
+        else:
+            if 0 in cache:
+                cache[cache.index(0)]=x
+                return 1
+            cache=[]
+            for cache_poj in range(0,k):
+                cache.append(0)
+            return 1
+                
+    elif obsluga=='lru':
+        if x not in cache: # usuwamy 1. element  i wstawiamy x na koncu
+            cache.pop(0)
+            cache.append(x)
+            return 1
+        else: # przesuwamy x na koniec
+            cache.pop(cache.index(x))
+            cache.append(x)
+            return 0
+        
+    elif obsluga=='lfu':
+        if x in cache:
+            flags_use_cach[cache.index(x)]+=1
+            return 0
+        else:
+            if 0 in cache: # unika zer w rez
+                flags_use_cach[cache.index(0)]=1
+                cache[cache.index(0)]=x
+                return 1
+            if x in rez:
+                cache.append(x)
+                flags_use_cach.append(flags_use_res[rez.index(x)]+1) # to opt rez.idx
+                flags_use_res.pop(rez.index(x))
+                rez.pop(rez.index(x))
+                cachmintmpidx=flags_use_cach.index(min(flags_use_cach))
+                rez.append(cache[cachmintmpidx])
+                flags_use_res.append(flags_use_cach[cachmintmpidx])
+                cache.pop(cachmintmpidx)
+                flags_use_cach.pop(cachmintmpidx)
+                return 1
+            elif x not in rez:
+                cache.append(x)
+                flags_use_cach.append(1)
+                cachmintmpidx=flags_use_cach.index(min(flags_use_cach))
+                rez.append(cache[cachmintmpidx])
+                flags_use_res.append(flags_use_cach[cachmintmpidx])
+                cache.pop(cachmintmpidx)
+                flags_use_cach.pop(cachmintmpidx)
+                return 1
+                
+    elif obsluga=='rand':
+        if x in cache:
+            return 0
+        else:
+            if 0 in cache:
+                cache[cache.index(0)]=x
+            elif 0 not in cache:
+                cache.pop(random.randint(0,len(cache)-1))
+                cache.append(x)
+                return 1
+        
+    elif obsluga=='rma':
+        if x in cache:
+            mark[cache.index(x)]='o'
+            return 0
+        else:
+            if 'n' not in mark: # if all marked then all dismark
+                for i in range(0,len(mark)):
+                    mark[i]='n'
+            dismark_indices=[]
+            for i in range(0,len(mark)):
+                if mark[i]=='n':
+                    dismark_indices.append(i)
+            ind=random.randint(0,len(dismark_indices)-1)
+            mark.pop(ind)
+            cache.pop(ind)
+            cache.append(x)
+            mark.append('o')
+            return 1
+        
+    else: return 'nieznana metoda obslugi cache\'a'
+
+# inicjalizacja n i k
+n = [20, 30, 40, 50, 60, 70, 80, 90, 100]
+n=40
+k=[]
+k_new=int(n/10)
+while k_new <= n/5:
+    k.append(k_new)
+    k_new+=1
+
+k=int(n/10)
+# glowna symulacja
+cache = []
+rez=[]
+mark=[]
+flags_use_cach=[]
+flags_use_res=[]
+for cache_poj in range(0,k):
+    cache.append(0)
+    flags_use_cach.append(0)
+    mark.append(0)
+
+
+
+
