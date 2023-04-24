@@ -5,6 +5,7 @@ Created on Mon Apr 10 12:45:55 2023
 @author: t-jan
 """
 import random
+import matplotlib.pyplot as plt
 #import math
 
 def Harmonic_Number(n):
@@ -116,7 +117,8 @@ def zadanie(x,cache,rez,obsluga,mark,flags_use_cach,flags_use_res):
         else:
             if 0 in cache:
                 cache[cache.index(0)]=x
-            elif 0 not in cache:
+                return 1
+            else:
                 cache.pop(random.randint(0,len(cache)-1))
                 cache.append(x)
                 return 1
@@ -144,25 +146,51 @@ def zadanie(x,cache,rez,obsluga,mark,flags_use_cach,flags_use_res):
 
 # inicjalizacja n i k
 n = [20, 30, 40, 50, 60, 70, 80, 90, 100]
-n=40
-k=[]
+
+
+n=70
+rozklad='g'
+rep=700
+
+kk=[]
 k_new=int(n/10)
 while k_new <= n/5:
-    k.append(k_new)
+    kk.append(k_new)
     k_new+=1
+obslugi=['fifo','fwf','lru','lfu','rand','rma']
+colors=['limegreen','crimson','yellow','hotpink','b','orangered']
 
-k=int(n/10)
-# glowna symulacja
-cache = []
-rez=[]
-mark=[]
-flags_use_cach=[]
-flags_use_res=[]
-for cache_poj in range(0,k):
-    cache.append(0)
-    flags_use_cach.append(0)
-    mark.append(0)
-
-
-
+for k in kk:
+    for ob in obslugi:
+        koszt=0
+        for rr in range(0,rep):
+            cache = []
+            rez=[]
+            mark=[]
+            flags_use_cach=[]
+            flags_use_res=[]
+            for cache_poj in range(0,k):
+                cache.append(0)
+                flags_use_cach.append(0)
+                mark.append(0)
+            for xx in range(0,n):
+                x=random_number(rozklad, n)
+                koszt+=zadanie(x,cache,rez,ob,mark,flags_use_cach,flags_use_res)
+        if k==kk[0]:
+            plt.scatter(k,koszt/rep,color=colors[obslugi.index(ob)],label=ob)
+        else:
+            plt.scatter(k,koszt/rep,color=colors[obslugi.index(ob)])
+            
+plt.xlabel('k - pojemność cache\'a')
+plt.ylabel('koszt n operacji')
+plt.legend()
+if rozklad=='j':
+    plt.title('Rozkład jednostajny\n n='+str(n))
+elif rozklad=='h':
+    plt.title('Rozkład harmoniczny\n n='+str(n))
+elif rozklad=='d':
+    plt.title('Rozkład dwuharmoniczny\n n='+str(n))
+elif rozklad=='g':
+    plt.title('Rozkład geometryczny\n n='+str(n))
+plt.show()
 
